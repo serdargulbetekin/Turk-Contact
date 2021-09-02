@@ -6,7 +6,10 @@ import com.example.turk_contacts.api.ContactApi
 import retrofit2.HttpException
 import java.io.IOException
 
-class ContactPagingSource constructor(private val contactApi: ContactApi) :
+class ContactPagingSource constructor(
+    private val contactApi: ContactApi,
+    private val searchInput: String
+) :
     PagingSource<Int, ContactItem>() {
     override fun getRefreshKey(state: PagingState<Int, ContactItem>): Int? {
         return state.anchorPosition
@@ -16,7 +19,9 @@ class ContactPagingSource constructor(private val contactApi: ContactApi) :
         val page = params.key ?: PAGE_INDEX
 
         return try {
-            val response = contactApi.getContacts(page, params.loadSize)
+            val response = if (searchInput.isEmpty()) contactApi.getContacts(page, params.loadSize)
+            else contactApi.searchContacts(searchInput, page, params.loadSize)
+
             LoadResult.Page(
                 response,
                 prevKey = if (page == 1) null else page - 1,

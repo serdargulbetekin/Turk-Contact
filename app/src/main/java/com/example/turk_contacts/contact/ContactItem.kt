@@ -17,7 +17,5 @@ data class ContactItem(
     @field:Json(name = "createdAt") val createdAt: String,
     @field:Json(name = "id") val id: String,
 ) : Parcelable {
-
     val createdContactDate = ContactDate.convertToContactDate(createdAt)
-
 }
