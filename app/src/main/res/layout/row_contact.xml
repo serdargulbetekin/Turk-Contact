@@ -15,10 +15,20 @@
         android:layout_height="wrap_content"
         android:textSize="16sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/imageView_3dot"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Serdar Gülbetekin" />
+
+
+    <ImageView
+        android:id="@+id/imageView_3dot"
+        android:layout_width="40dp"
+        android:layout_height="20dp"
+        android:src="@drawable/icon_3dot"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/textView_nameSurname"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/textView_email"

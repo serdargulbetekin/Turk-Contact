@@ -25,12 +25,11 @@ interface ContactApi {
         @Path("id") id: String,
         @Query("name") name: String,
         @Query("surname") surname: String,
-    ): List<ContactItem>
+    )
 
     @DELETE("contacts/{id}")
     suspend fun deleteContact(
         @Path("id") id: String,
-    ): List<ContactItem>
-
+    )
 
 }

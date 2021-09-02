@@ -8,12 +8,15 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.turk_contacts.databinding.RowContactBinding
 
-class ContactAdapter(private val onItemClick: (ContactItem) -> Unit) :
+class ContactAdapter(
+    private val onItemClick: (ContactItem) -> Unit,
+    private val on3dotClick: (ContactItem) -> Unit,
+) :
     PagingDataAdapter<ContactItem, ContactViewHolder>(Diff) {
     override fun onBindViewHolder(holder: ContactViewHolder, position: Int) {
         val contactItem: ContactItem? = getItem(position)
         if (contactItem != null) {
-            holder.bindItem(contactItem, onItemClick)
+            holder.bindItem(contactItem, onItemClick, on3dotClick)
         }
     }
 
@@ -40,7 +43,10 @@ class ContactViewHolder(private val contactBinding: RowContactBinding) :
     RecyclerView.ViewHolder(contactBinding.root) {
 
     @SuppressLint("SetTextI18n")
-    fun bindItem(contactItem: ContactItem, onItemClick: (ContactItem) -> Unit) {
+    fun bindItem(contactItem: ContactItem,
+                 onItemClick: (ContactItem) -> Unit,
+                 on3dotClick: (ContactItem) -> Unit,
+    ) {
         contactBinding.apply {
             textViewNameSurname.text = contactItem.name + " " + contactItem.surname
             textViewEmail.text = contactItem.email
@@ -49,6 +55,9 @@ class ContactViewHolder(private val contactBinding: RowContactBinding) :
 
             constraintContainer.setOnClickListener {
                 onItemClick(contactItem)
+            }
+            constraintContainer.setOnClickListener {
+                on3dotClick(contactItem)
             }
         }
     }

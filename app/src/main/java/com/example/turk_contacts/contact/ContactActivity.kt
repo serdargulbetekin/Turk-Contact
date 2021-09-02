@@ -10,6 +10,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.turk_contacts.contactdetail.ContactDetailActivity
 import com.example.turk_contacts.databinding.ActivityContactBinding
+import com.example.turk_contacts.uikit.ChoiceDialog
+import com.example.turk_contacts.uikit.ChoiceDialogProperties
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 
@@ -19,9 +21,11 @@ class ContactActivity : AppCompatActivity() {
     private val viewBinding by lazy { ActivityContactBinding.inflate(layoutInflater) }
     private val viewModel: ContactViewModel by viewModels()
     private val contactAdapter by lazy {
-        ContactAdapter {
+        ContactAdapter({
             onItemClick(it)
-        }
+        }, {
+            on3dotClick(it)
+        })
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,5 +77,25 @@ class ContactActivity : AppCompatActivity() {
                 contactItem
             )
         )
+    }
+
+    private fun on3dotClick(contactItem: ContactItem) {
+        viewModel.on3dotClick()
+        viewModel.menuItemLiveData.observe(this, { item ->
+            ChoiceDialog(
+                this,
+                ChoiceDialogProperties<MenuItemEnum>().also {
+                    it.title = "Kişiler"
+                    it.itemList = item
+                    it.itemsOnClick = { dialog, item ->
+                        dialog.dismiss()
+                        when (item) {
+                            MenuItemEnum.DETAIL -> onItemClick(contactItem)
+                            MenuItemEnum.UPDATE -> viewModel.onUpdate(contactItem)
+                            MenuItemEnum.DELETE -> viewModel.onDelete(contactItem)
+                        }
+                    }
+                }).show()
+        })
     }
 }

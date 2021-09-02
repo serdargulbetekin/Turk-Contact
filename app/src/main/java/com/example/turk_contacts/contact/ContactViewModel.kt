@@ -2,10 +2,7 @@ package com.example.turk_contacts.contact
 
 
 import android.annotation.SuppressLint
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.switchMap
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import androidx.paging.*
 import com.example.turk_contacts.api.ContactApi
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,6 +17,9 @@ class ContactViewModel @Inject constructor(
     private val contactRepository: ContactRepository
 ) : ViewModel() {
 
+    private val menuItemMutableLiveData = MutableLiveData<List<MenuItemEnum>>()
+    val menuItemLiveData: LiveData<List<MenuItemEnum>>
+        get() = menuItemMutableLiveData
 
     private val currentQuery = MutableLiveData("")
 
@@ -31,4 +31,24 @@ class ContactViewModel @Inject constructor(
         currentQuery.postValue(input)
     }
 
+    fun on3dotClick() {
+        menuItemMutableLiveData.postValue(MenuItemEnum.values().toList())
+    }
+
+    fun onUpdate(contactItem: ContactItem) {
+
+    }
+
+    fun onDelete(contactItem: ContactItem) {
+        viewModelScope.launch(Dispatchers.IO) {
+            contactRepository.deleteContact(contactItem)
+        }
+    }
+
+}
+
+enum class MenuItemEnum(val typeName: String) {
+    UPDATE("Güncelle"),
+    DELETE("Sil"),
+    DETAIL("Detay")
 }
