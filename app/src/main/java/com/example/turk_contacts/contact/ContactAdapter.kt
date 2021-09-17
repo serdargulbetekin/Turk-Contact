@@ -56,7 +56,7 @@ class ContactViewHolder(private val contactBinding: RowContactBinding) :
             constraintContainer.setOnClickListener {
                 onItemClick(contactItem)
             }
-            constraintContainer.setOnClickListener {
+            imageView3dot.setOnClickListener {
                 on3dotClick(contactItem)
             }
         }

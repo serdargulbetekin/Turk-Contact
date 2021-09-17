@@ -29,7 +29,7 @@ interface ContactApi {
 
     @DELETE("contacts/{id}")
     suspend fun deleteContact(
-        @Path("id") id: String,
+        @Path("id") id: String
     )
 
 }

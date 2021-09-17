@@ -1,19 +1,17 @@
 package com.example.turk_contacts.contact
 
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.turk_contacts.contactdetail.ContactDetailActivity
 import com.example.turk_contacts.databinding.ActivityContactBinding
 import com.example.turk_contacts.uikit.ChoiceDialog
 import com.example.turk_contacts.uikit.ChoiceDialogProperties
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
 
 @AndroidEntryPoint
 class ContactActivity : AppCompatActivity() {
@@ -33,9 +31,7 @@ class ContactActivity : AppCompatActivity() {
         setContentView(viewBinding.root)
 
         viewBinding.apply {
-            progressBar.isVisible = true
             recyclerView.apply {
-                isVisible = false
                 layoutManager = LinearLayoutManager(this@ContactActivity)
                 adapter = contactAdapter.withLoadStateHeaderAndFooter(
                     header = LoadingStateAdapter { contactAdapter.retry() },
@@ -60,13 +56,16 @@ class ContactActivity : AppCompatActivity() {
         }
 
         viewModel.contacts.observe(this) { response ->
-            viewBinding.apply {
-                recyclerView.isVisible = true
-                progressBar.isVisible = false
-            }
             contactAdapter.submitData(this.lifecycle, response)
         }
 
+        viewModel.progress.observe(this, {
+            if (it) {
+                viewBinding.progressBar.visibility = View.VISIBLE
+            } else {
+                viewBinding.progressBar.visibility = View.GONE
+            }
+        })
 
     }
 
@@ -80,22 +79,20 @@ class ContactActivity : AppCompatActivity() {
     }
 
     private fun on3dotClick(contactItem: ContactItem) {
-        viewModel.on3dotClick()
-        viewModel.menuItemLiveData.observe(this, { item ->
-            ChoiceDialog(
-                this,
-                ChoiceDialogProperties<MenuItemEnum>().also {
-                    it.title = "Kişiler"
-                    it.itemList = item
-                    it.itemsOnClick = { dialog, item ->
-                        dialog.dismiss()
-                        when (item) {
-                            MenuItemEnum.DETAIL -> onItemClick(contactItem)
-                            MenuItemEnum.UPDATE -> viewModel.onUpdate(contactItem)
-                            MenuItemEnum.DELETE -> viewModel.onDelete(contactItem)
-                        }
+        ChoiceDialog(
+            this,
+            ChoiceDialogProperties<MenuItemEnum>().also {
+                it.title = "Kişiler"
+                it.itemList = MenuItemEnum.values().toList()
+                it.itemsOnClick = { dialog, item ->
+                    dialog.dismiss()
+                    when (item) {
+                        MenuItemEnum.DETAIL -> onItemClick(contactItem)
+                        MenuItemEnum.UPDATE -> viewModel.onUpdate(contactItem)
+                        MenuItemEnum.DELETE -> viewModel.onDelete(contactItem)
                     }
-                }).show()
-        })
+                }
+            }).show()
     }
+
 }

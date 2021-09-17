@@ -11,7 +11,7 @@ data class ContactItem(
     @field:Json(name = "email") val email: String,
     @field:Json(name = "company_name") val company_name: String,
     @field:Json(name = "department") val department: String,
-    @field:Json(name = "number") val number: Int,
+    @field:Json(name = "number") val number: String,
     @field:Json(name = "surname") val surname: String,
     @field:Json(name = "name") val name: String,
     @field:Json(name = "createdAt") val createdAt: String,

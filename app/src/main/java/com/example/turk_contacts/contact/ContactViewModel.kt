@@ -3,11 +3,9 @@ package com.example.turk_contacts.contact
 
 import android.annotation.SuppressLint
 import androidx.lifecycle.*
-import androidx.paging.*
-import com.example.turk_contacts.api.ContactApi
+import androidx.paging.cachedIn
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,11 +15,12 @@ class ContactViewModel @Inject constructor(
     private val contactRepository: ContactRepository
 ) : ViewModel() {
 
-    private val menuItemMutableLiveData = MutableLiveData<List<MenuItemEnum>>()
-    val menuItemLiveData: LiveData<List<MenuItemEnum>>
-        get() = menuItemMutableLiveData
 
-    private val currentQuery = MutableLiveData("")
+    private val _progress = MutableLiveData<Boolean>()
+    val progress: LiveData<Boolean>
+        get() = _progress
+
+    private val currentQuery = MutableLiveData(DEFAULT_QUERY)
 
     val contacts = currentQuery.switchMap { queryString ->
         contactRepository.getAllContacts(queryString).cachedIn(viewModelScope)
@@ -31,20 +30,22 @@ class ContactViewModel @Inject constructor(
         currentQuery.postValue(input)
     }
 
-    fun on3dotClick() {
-        menuItemMutableLiveData.postValue(MenuItemEnum.values().toList())
-    }
-
     fun onUpdate(contactItem: ContactItem) {
 
     }
 
     fun onDelete(contactItem: ContactItem) {
+        _progress.postValue(true)
         viewModelScope.launch(Dispatchers.IO) {
             contactRepository.deleteContact(contactItem)
+            searchContact(DEFAULT_QUERY)
+            _progress.postValue(false)
         }
     }
 
+    companion object {
+        private const val DEFAULT_QUERY = ""
+    }
 }
 
 enum class MenuItemEnum(val typeName: String) {
